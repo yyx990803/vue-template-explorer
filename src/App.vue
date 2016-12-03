@@ -65,6 +65,8 @@ export default {
     const hashInput = window.location.hash.slice(1)
     if (hashInput) {
       _compile(this, decodeURIComponent(hashInput))
+    } else {
+      _compile(this, `<div id="app">{{ msg }}</div>`)
     }
   },
   methods: {
