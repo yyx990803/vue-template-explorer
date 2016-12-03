@@ -5,10 +5,12 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --inline --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "start": "list"
   },
   "dependencies": {
     "js-beautify": "^1.6.4",
+    "list": "^0.8.2",
     "lodash.debounce": "^4.0.8",
     "vue": "^2.1.0",
     "vue-codemirror": "^2.1.2"
