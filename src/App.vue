@@ -20,9 +20,7 @@ import stripWith from 'vue-template-es2015-compiler'
 function _compile (vm, input) {
   vm.input = input
   window.location.hash = encodeURIComponent(input)
-  const res = compile(input, {
-    preserveWhitespace: false
-  })
+  const res = compile(input, { preserveWhitespace: false })
   vm.errors = res.errors
   if (!res.errors.length) {
     let code = `function render () {${res.render.toString()}}`
