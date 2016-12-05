@@ -40,7 +40,12 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true
   },
-  devtool: '#eval-source-map'
+  devtool: '#eval-source-map',
+  plugins: [
+    new webpack.DefinePlugin({
+      VUE_VERSION: JSON.stringify(require('./node_modules/vue/package.json').version)
+    })
+  ]
 }
 
 if (process.env.NODE_ENV === 'production') {

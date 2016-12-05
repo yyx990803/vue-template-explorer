@@ -1,12 +1,22 @@
 <template>
   <div id="app">
-    <h1>Vue Template Explorer</h1>
-    <label class="with-toggle"><input type="checkbox" v-model="stripWith"> Strip with?</label>
-    <codemirror :code="input" :options="editorOptions" @changed="compile"></codemirror>
-    <codemirror :code="output" :options="outputOptions"></codemirror>
-    <transition>
-      <pre class="error" v-if="errors.length"><div v-for="e in errors">{{e}}</div></pre>
-    </transition>
+    <h1>Vue Template Explorer (Vue version: {{version}})</h1>
+    <label class="with-toggle">
+      <input type="checkbox" v-model="stripWith">
+      Strip with?
+    </label>
+    <div class="main">
+      <codemirror
+        :code="input"
+        :options="inputOptions"
+        @changed="onInput">
+      </codemirror>
+      <codemirror
+        :code="output.code"
+        :options="outputOptions">
+      </codemirror>
+      <pre class="error" v-if="output.errors.length"><div v-for="e in output.errors">{{e}}</div></pre>
+    </div>
   </div>
 </template>
 
@@ -17,32 +27,15 @@ import debounce from 'lodash.debounce'
 import beautify from 'js-beautify'
 import stripWith from 'vue-template-es2015-compiler'
 
-function _compile (vm, input) {
-  vm.input = input
-  window.location.hash = encodeURIComponent(input)
-  const res = compile(input, { preserveWhitespace: false })
-  vm.errors = res.errors
-  if (!res.errors.length) {
-    let code = `function render () {${res.render.toString()}}`
-    if (vm.stripWith) {
-      code = stripWith(code)
-    }
-    vm.output = beautify(code, {
-      indent_size: 2
-    })
-  }
-}
-
 export default {
   name: 'app',
   components: { codemirror },
   data () {
     return {
       input: '',
-      output: '',
-      errors: [],
+      version: VUE_VERSION,
       stripWith: false,
-      editorOptions: {
+      inputOptions: {
         tabSize: 2,
         mode: 'text/html',
         theme: 'base16-light',
@@ -56,30 +49,57 @@ export default {
       }
     }
   },
-  watch: {
-    stripWith () {
-      _compile(this, this.input)
+  computed: {
+    output () {
+      if (!this.input.trim()) {
+        return { errors: [], code: '' }
+      }
+      const res = compile(this.input, { preserveWhitespace: false })
+      if (!res.errors.length) {
+        let code = `function render () {${res.render.toString()}}`
+        if (this.stripWith) {
+          code = stripWith(code)
+        }
+        return {
+          errors: [],
+          code: beautify(code, { indent_size: 2 })
+        }
+      } else {
+        return {
+          errors: res.errors,
+          code: ''
+        }
+      }
     }
   },
   mounted () {
     const hashInput = window.location.hash.slice(1)
-    if (hashInput) {
-      _compile(this, decodeURIComponent(hashInput))
-    } else {
-      _compile(this, `<div id="app">{{ msg }}</div>`)
-    }
+    this.input = hashInput
+      ? decodeURIComponent(hashInput)
+      : `<div id="app">{{ msg }}</div>`
+    this.setHeight()
+    window.addEventListener('resize', this.setHeight)
   },
   methods: {
-    compile: debounce(function (input) {
-      _compile(this, input)
-    }, 300)
+    onInput: debounce(function (input) {
+      this.input = input
+      window.location.hash = encodeURIComponent(input)
+    }, 500),
+
+    setHeight () {
+      const mirrors = [...this.$el.querySelectorAll('.CodeMirror')]
+      const top = mirrors[0].getBoundingClientRect().top
+      const height = window.innerHeight - top
+      mirrors.forEach(m => m.style.height = height + 'px')
+    }
   }
 }
 </script>
 
 <style>
 body {
-  font-family: Menlo;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
   color: #333;
   margin: 0;
 }
@@ -89,33 +109,30 @@ h1 {
   font-size: 1.2em;
 }
 
+.main {
+  position: relative;
+  height: 100%;
+  display: flex;
+}
+
 .CodeMirror {
-  display: inline-block;
-  box-sizing: border-box;
+  line-height: 1.4em;
+  position: absolute;
   width: 50%;
-  height: 750px !important;
-  font-size: 1.1em;
-  line-height: 1.3em;
 }
 
 .error {
-  position: fixed;
+  position: absolute;
   z-index: 999;
-  margin: 0;
-  bottom: 0;
-  left: 0;
+  top: 0;
   right: 0;
+  left: 50%;
   background-color: #f33;
   font-size: .9em;
   color: #fff;
   font-family: Menlo;
   padding: 1em;
-  transition: all .2s ease-in-out;
-}
-
-.error.v-enter, .error.v-leave-active {
-  opacity: 0;
-  transform: translate(0, 100%);
+  margin: 0;
 }
 
 .with-toggle {
