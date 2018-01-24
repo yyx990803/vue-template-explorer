@@ -31,6 +31,8 @@ import { codemirror } from 'vue-codemirror'
 import debounce from 'lodash.debounce'
 import beautify from 'js-beautify'
 import stripWith from 'vue-template-es2015-compiler'
+import serverRenderer from 'vue-server-renderer/basic'
+import Vue from 'vue'
 
 export default {
   name: 'app',
@@ -62,7 +64,7 @@ export default {
       }
       const res = compile(this.input, { preserveWhitespace: false })
       if (!res.errors.length) {
-        let code = `function render () {${res.render.toString()}}`
+        let code = this.serverRender() || `function render () {${res.render.toString()}}`
         if (this.stripWith) {
           code = stripWith(code)
         }
@@ -97,6 +99,11 @@ export default {
       const top = mirrors[0].getBoundingClientRect().top
       const height = window.innerHeight - top
       mirrors.forEach(m => m.style.height = height + 'px')
+    },
+    serverRender() {
+        var vm = new Vue({template: this.input})
+        serverRenderer(vm, () => {})
+        return vm.$options.render.toString()
     }
   }
 }
