@@ -7,12 +7,12 @@
     </label>
     <div class="main">
       <codemirror
-        :code="input"
+        :value="input"
         :options="inputOptions"
-        @changed="onInput">
+        @input="onInput">
       </codemirror>
       <codemirror
-        :code="output.code"
+        :value="output.code"
         :options="outputOptions">
       </codemirror>
       <pre class="error" v-if="output.errors.length"><div v-for="e in output.errors">{{e}}</div></pre>
@@ -21,6 +21,11 @@
 </template>
 
 <script>
+import 'codemirror/mode/vue/vue.js'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/base16-dark.css'
+import 'codemirror/theme/base16-light.css'
+
 import { compile } from 'vue-template-compiler/build.js'
 import { codemirror } from 'vue-codemirror'
 import debounce from 'lodash.debounce'
@@ -45,6 +50,7 @@ export default {
       outputOptions: {
         tabSize: 2,
         mode: 'text/javascript',
+        readOnly: true,
         theme: 'base16-dark'
       }
     }
@@ -115,9 +121,8 @@ h1 {
   display: flex;
 }
 
-.CodeMirror {
+.vue-codemirror {
   line-height: 1.4em;
-  position: absolute;
   width: 50%;
 }
 
