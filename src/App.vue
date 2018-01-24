@@ -5,6 +5,10 @@
       <input type="checkbox" v-model="stripWith">
       Strip with?
     </label>
+    <label class="server-toggle">
+      <input type="checkbox" v-model="serverRender">
+      Server Render?
+    </label>
     <div class="main">
       <codemirror
         :value="input"
@@ -42,6 +46,7 @@ export default {
       input: '',
       version: VUE_VERSION,
       stripWith: false,
+      serverRender: false,
       inputOptions: {
         tabSize: 2,
         mode: 'text/html',
@@ -64,13 +69,15 @@ export default {
       }
       const res = compile(this.input, { preserveWhitespace: false })
       if (!res.errors.length) {
-        let code = this.serverRender() || `function render () {${res.render.toString()}}`
+        let code = this.serverRender
+          ? this.compileServer()
+          : `function render () {${res.render.toString()}}`
         if (this.stripWith) {
           code = stripWith(code)
         }
         return {
           errors: [],
-          code: beautify(code, { indent_size: 2 })
+          code: beautify(code, { indent_size: 2, wrap_line_length: 80, jslint_happy: true })
         }
       } else {
         return {
@@ -100,10 +107,10 @@ export default {
       const height = window.innerHeight - top
       mirrors.forEach(m => m.style.height = height + 'px')
     },
-    serverRender() {
-        var vm = new Vue({template: this.input})
-        serverRenderer(vm, () => {})
-        return vm.$options.render.toString()
+    compileServer() {
+      const vm = new Vue({template: this.input})
+      serverRenderer(vm, () => {})
+      return vm.$options.render.toString()
     }
   }
 }
@@ -147,9 +154,12 @@ h1 {
   margin: 0;
 }
 
-.with-toggle {
+.with-toggle, .server-toggle {
   position: fixed;
   top: 1em;
   right: 15px;
+}
+.server-toggle {
+  right: 150px;
 }
 </style>
