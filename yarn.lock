@@ -4511,8 +4511,8 @@ time-stamp@^2.0.0:
   resolved "https://registry.yarnpkg.com/time-stamp/-/time-stamp-2.0.0.tgz#95c6a44530e15ba8d6f4a3ecb8c3a3fac46da357"
 
 timers-browserify@^2.0.4:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/timers-browserify/-/timers-browserify-2.0.5.tgz#04878fb12a155a159c9d1e59faa1f77bf4ecc44c"
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/timers-browserify/-/timers-browserify-2.0.6.tgz#241e76927d9ca05f4d959819022f5b3664b64bae"
   dependencies:
     setimmediate "^1.0.4"
 
@@ -4762,8 +4762,8 @@ vue-server-renderer@^2.5.13:
     source-map "0.5.6"
 
 vue-style-loader@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-3.1.0.tgz#d5650030d2e3cbb9eb57cf92f5f82be735175230"
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-3.1.1.tgz#74fdef91a81d38bc0125746a1b5505e62d69e32c"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
